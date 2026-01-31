@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiny's Todo App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: white;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        input::placeholder { color: rgba(255,255,255,0.5); }
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            background: #e74c3c;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        .todo-list { list-style: none; }
+        .todo-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .todo-item.done span { text-decoration: line-through; opacity: 0.5; }
+        .todo-item span { cursor: pointer; flex: 1; }
+        .delete-btn {
+            background: transparent;
+            color: #e74c3c;
+            padding: 5px 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.5;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦕 Tiny's Todo</h1>
+        <div class="input-row">
+            <input type="text" id="todoInput" placeholder="What needs to be done?">
+            <button onclick="addTodo()">Add</button>
+        </div>
+        <ul class="todo-list" id="todoList"></ul>
+        <p class="footer">Built by Llama 3.2 running locally 🦙</p>
+    </div>
+    <script>
+        let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+        
+        function render() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = todos.map((todo, i) => `
+                <li class="todo-item ${todo.done ? 'done' : ''}">
+                    <span onclick="toggle(${i})">${todo.text}</span>
+                    <button class="delete-btn" onclick="remove(${i})">✕</button>
+                </li>
+            `).join('');
+        }
+        
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            if (input.value.trim()) {
+                todos.push({ text: input.value.trim(), done: false });
+                localStorage.setItem('todos', JSON.stringify(todos));
+                input.value = '';
+                render();
+            }
+        }
+        
+        function toggle(i) {
+            todos[i].done = !todos[i].done;
+            localStorage.setItem('todos', JSON.stringify(todos));
+            render();
+        }
+        
+        function remove(i) {
+            todos.splice(i, 1);
+            localStorage.setItem('todos', JSON.stringify(todos));
+            render();
+        }
+        
+        document.getElementById('todoInput').addEventListener('keypress', e => {
+            if (e.key === 'Enter') addTodo();
+        });
+        
+        render();
+    </script>
+</body>
+</html>

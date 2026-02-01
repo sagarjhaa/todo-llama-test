@@ -3,297 +3,612 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiny's Advanced Todo</title>
+    <title>Tiny's Glass Todo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: 'Inter', -apple-system, sans-serif;
             min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background blobs */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+            z-index: 0;
+        }
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: #ff6b6b;
+            top: -200px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        .blob-2 {
+            width: 400px;
+            height: 400px;
+            background: #4ecdc4;
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: #ffe66d;
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.95); }
+            75% { transform: translate(-50px, -20px) scale(1.05); }
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Glassmorphism Card */
+        .glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        header p {
+            opacity: 0.8;
+            font-weight: 300;
+        }
+        
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
             color: white;
         }
-        .container { max-width: 800px; margin: 0 auto; }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
         }
-        h1 { font-size: 1.8rem; }
-        .stats {
-            display: flex;
-            gap: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Water Droplet Buttons */
+        .droplet-btn {
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.05) 100%
+            );
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px;
+            padding: 14px 28px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 2px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 2px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .droplet-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+        .droplet-btn:hover::before {
+            left: 100%;
+        }
+        .droplet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.15),
+                inset 0 2px 2px rgba(255, 255, 255, 0.4);
+        }
+        .droplet-btn:active {
+            transform: translateY(0);
+        }
+        
+        .droplet-btn.primary {
+            background: linear-gradient(
+                145deg,
+                rgba(231, 76, 60, 0.8) 0%,
+                rgba(192, 57, 43, 0.9) 100%
+            );
+            border-color: rgba(255, 100, 100, 0.5);
+        }
+        
+        .droplet-btn.small {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 30px;
         }
         
         /* Input Section */
         .input-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
         }
+        
         .input-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 15px;
         }
-        input[type="text"], select, input[type="date"] {
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
+        
+        .glass-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .glass-input:focus {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        .glass-select {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 20px;
+            color: white;
             font-size: 14px;
-            background: rgba(255,255,255,0.15);
+            outline: none;
+            cursor: pointer;
+            min-width: 130px;
+        }
+        .glass-select option {
+            background: #764ba2;
             color: white;
         }
-        input[type="text"] { flex: 1; }
-        input::placeholder { color: rgba(255,255,255,0.5); }
-        select { min-width: 120px; }
-        input[type="date"] { min-width: 140px; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
         
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
+        input[type="date"].glass-input {
+            min-width: 150px;
         }
-        .btn-primary { background: #e74c3c; color: white; }
-        .btn-secondary { background: rgba(255,255,255,0.2); color: white; }
-        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        input[type="date"].glass-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
         
-        /* Filters & Search */
+        /* Filters */
         .filters {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            padding: 20px 25px;
             margin-bottom: 20px;
-        }
-        .filter-btn {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-        .filter-btn.active { background: #e74c3c; }
-        .search-box {
-            flex: 1;
-            min-width: 200px;
         }
         
-        /* Categories */
-        .categories {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-        .category-tag {
-            padding: 6px 14px;
-            border-radius: 15px;
-            font-size: 12px;
-            white-space: nowrap;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: transparent;
+        .filter-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 10px 20px;
             color: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .category-tag.active { background: rgba(255,255,255,0.2); }
+        .filter-pill:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .filter-pill.active {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 180px;
+        }
         
         /* Todo List */
-        .todo-list { list-style: none; }
+        .todo-list {
+            list-style: none;
+            padding: 0 20px 20px;
+        }
+        
         .todo-item {
-            background: rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 15px;
-            transition: all 0.2s;
-            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .todo-item:hover { background: rgba(255,255,255,0.12); }
-        .todo-item.done { opacity: 0.5; }
-        .todo-item.done .todo-text { text-decoration: line-through; }
-        .todo-item.priority-high { border-left-color: #e74c3c; }
-        .todo-item.priority-medium { border-left-color: #f39c12; }
-        .todo-item.priority-low { border-left-color: #27ae60; }
+        .todo-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+        .todo-item.priority-high::before { background: linear-gradient(180deg, #ff6b6b, #ee5a5a); }
+        .todo-item.priority-medium::before { background: linear-gradient(180deg, #feca57, #ff9f43); }
+        .todo-item.priority-low::before { background: linear-gradient(180deg, #1dd1a1, #10ac84); }
         
-        .checkbox {
-            width: 22px;
-            height: 22px;
+        .todo-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateX(5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        .todo-item.done {
+            opacity: 0.5;
+        }
+        .todo-item.done .todo-text {
+            text-decoration: line-through;
+        }
+        
+        /* Water droplet checkbox */
+        .water-checkbox {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.4);
+            background: linear-gradient(
+                145deg,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.1)
+            );
+            border: 2px solid rgba(255, 255, 255, 0.4);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .checkbox.checked { background: #27ae60; border-color: #27ae60; }
-        .checkbox.checked::after { content: "✓"; font-size: 12px; }
+        .water-checkbox:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        .water-checkbox.checked {
+            background: linear-gradient(145deg, #1dd1a1, #10ac84);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .water-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
         
-        .todo-content { flex: 1; }
-        .todo-text { font-size: 15px; margin-bottom: 5px; }
+        .todo-content {
+            flex: 1;
+            color: white;
+        }
+        .todo-text {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
         .todo-meta {
             display: flex;
             gap: 15px;
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.7;
         }
-        .todo-meta span { display: flex; align-items: center; gap: 4px; }
+        .todo-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .overdue {
+            color: #ff6b6b !important;
+            opacity: 1 !important;
+        }
         
         .todo-actions {
             display: flex;
             gap: 8px;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: opacity 0.3s ease;
         }
-        .todo-item:hover .todo-actions { opacity: 1; }
-        .action-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
+        .todo-item:hover .todo-actions {
+            opacity: 1;
         }
-        .action-btn:hover { background: rgba(255,255,255,0.2); }
-        .action-btn.delete:hover { background: #e74c3c; }
         
-        /* Progress Bar */
-        .progress-container {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-        }
-        .progress-header {
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
             font-size: 14px;
         }
-        .progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-            overflow: hidden;
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
         }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #27ae60, #2ecc71);
-            border-radius: 4px;
-            transition: width 0.3s;
+        .action-btn.delete:hover {
+            background: rgba(231, 76, 60, 0.5);
         }
         
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            opacity: 0.5;
+            color: white;
         }
-        .empty-state .emoji { font-size: 48px; margin-bottom: 15px; }
+        .empty-state .emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+        }
+        .empty-state p {
+            opacity: 0.7;
+            font-size: 16px;
+        }
+        
+        /* Progress Ring */
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .progress-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        .progress-ring .bg {
+            stroke: rgba(255, 255, 255, 0.2);
+        }
+        .progress-ring .progress {
+            stroke: url(#gradient);
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .progress-info h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .progress-info p {
+            opacity: 0.7;
+            font-size: 14px;
+        }
         
         /* Footer */
         .footer {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            opacity: 0.4;
+            padding: 30px;
+            color: white;
+            opacity: 0.6;
             font-size: 13px;
+        }
+        .footer a {
+            color: white;
         }
         
         /* Responsive */
         @media (max-width: 600px) {
             .input-row { flex-wrap: wrap; }
-            select, input[type="date"] { flex: 1; min-width: calc(50% - 5px); }
-            .stats { display: none; }
+            .glass-select, input[type="date"].glass-input {
+                flex: 1;
+                min-width: calc(50% - 6px);
+            }
+            .stats-row { flex-wrap: wrap; }
+            .stat-card { min-width: calc(50% - 8px); }
+        }
+        
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    
     <div class="container">
-        <header>
-            <h1>🦕 Tiny's Advanced Todo</h1>
-            <div class="stats">
-                <span id="totalCount">0 tasks</span>
-                <span id="dueToday">0 due today</span>
-            </div>
+        <header class="glass">
+            <h1>🦕 Tiny's Glass Todo</h1>
+            <p>Beautiful glassmorphism design powered by local AI</p>
         </header>
         
-        <div class="progress-container">
-            <div class="progress-header">
-                <span>Progress</span>
-                <span id="progressText">0%</span>
+        <div class="stats-row">
+            <div class="stat-card glass">
+                <div class="stat-value" id="totalTasks">0</div>
+                <div class="stat-label">Total Tasks</div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            <div class="stat-card glass">
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card glass">
+                <div class="stat-value" id="pendingTasks">0</div>
+                <div class="stat-label">Pending</div>
             </div>
         </div>
         
-        <div class="input-section">
+        <div class="progress-container glass">
+            <div class="progress-ring">
+                <svg width="80" height="80">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#1dd1a1" />
+                            <stop offset="100%" style="stop-color:#10ac84" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="bg" cx="40" cy="40" r="32"></circle>
+                    <circle class="progress" cx="40" cy="40" r="32" 
+                        stroke-dasharray="201" 
+                        stroke-dashoffset="201"
+                        id="progressCircle"></circle>
+                </svg>
+                <div class="progress-text" id="progressPercent">0%</div>
+            </div>
+            <div class="progress-info">
+                <h3>Your Progress</h3>
+                <p id="progressMessage">Add some tasks to get started!</p>
+            </div>
+        </div>
+        
+        <div class="input-section glass">
             <div class="input-row">
-                <input type="text" id="todoInput" placeholder="What needs to be done?">
-                <button class="btn btn-primary" onclick="addTodo()">Add Task</button>
+                <input type="text" class="glass-input" id="todoInput" placeholder="✨ What amazing thing will you do?">
+                <button class="droplet-btn primary" onclick="addTodo()">Add Task</button>
             </div>
             <div class="input-row">
-                <select id="prioritySelect">
+                <select class="glass-select" id="prioritySelect">
                     <option value="low">🟢 Low</option>
                     <option value="medium" selected>🟡 Medium</option>
                     <option value="high">🔴 High</option>
                 </select>
-                <select id="categorySelect">
+                <select class="glass-select" id="categorySelect">
                     <option value="personal">👤 Personal</option>
                     <option value="work">💼 Work</option>
                     <option value="shopping">🛒 Shopping</option>
                     <option value="health">❤️ Health</option>
-                    <option value="other">📌 Other</option>
                 </select>
-                <input type="date" id="dueDate">
+                <input type="date" class="glass-input" id="dueDate">
             </div>
         </div>
         
-        <div class="filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="active">Active</button>
-            <button class="filter-btn" data-filter="completed">Completed</button>
-            <button class="filter-btn" data-filter="overdue">Overdue</button>
-            <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search tasks...">
+        <div class="filters glass">
+            <button class="filter-pill active" data-filter="all">🌟 All</button>
+            <button class="filter-pill" data-filter="active">⚡ Active</button>
+            <button class="filter-pill" data-filter="completed">✅ Done</button>
+            <button class="filter-pill" data-filter="overdue">🔥 Overdue</button>
+            <input type="text" class="glass-input search-input" id="searchBox" placeholder="🔍 Search...">
         </div>
         
-        <div class="categories" id="categoryFilters"></div>
-        
-        <ul class="todo-list" id="todoList"></ul>
+        <div class="glass" style="padding-bottom: 10px;">
+            <ul class="todo-list" id="todoList"></ul>
+        </div>
         
         <div class="footer">
-            Built by Llama 3.2 (3B) running locally on Mac 🦙<br>
-            Testing the limits of local AI inference
+            Built with 💜 by Llama 3.2 (3B) running locally on Mac<br>
+            Glassmorphism UI • Zero API cost 🦙
         </div>
     </div>
     
     <script>
-        let todos = JSON.parse(localStorage.getItem('todos-advanced') || '[]');
+        let todos = JSON.parse(localStorage.getItem('todos-glass') || '[]');
         let currentFilter = 'all';
-        let currentCategory = 'all';
         let searchQuery = '';
-        
-        const categories = {
-            personal: { emoji: '👤', color: '#9b59b6' },
-            work: { emoji: '💼', color: '#3498db' },
-            shopping: { emoji: '🛒', color: '#e67e22' },
-            health: { emoji: '❤️', color: '#e74c3c' },
-            other: { emoji: '📌', color: '#95a5a6' }
-        };
         
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -320,58 +635,46 @@
         }
         
         function saveTodos() {
-            localStorage.setItem('todos-advanced', JSON.stringify(todos));
-        }
-        
-        function getFilteredTodos() {
-            return todos.filter(todo => {
-                // Filter by status
-                if (currentFilter === 'active' && todo.done) return false;
-                if (currentFilter === 'completed' && !todo.done) return false;
-                if (currentFilter === 'overdue' && (!isOverdue(todo.dueDate) || todo.done)) return false;
-                
-                // Filter by category
-                if (currentCategory !== 'all' && todo.category !== currentCategory) return false;
-                
-                // Filter by search
-                if (searchQuery && !todo.text.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-                
-                return true;
-            });
+            localStorage.setItem('todos-glass', JSON.stringify(todos));
         }
         
         function updateStats() {
             const total = todos.length;
             const completed = todos.filter(t => t.done).length;
-            const today = new Date().toISOString().split('T')[0];
-            const dueToday = todos.filter(t => t.dueDate === today && !t.done).length;
-            
-            document.getElementById('totalCount').textContent = `${total} task${total !== 1 ? 's' : ''}`;
-            document.getElementById('dueToday').textContent = `${dueToday} due today`;
-            
+            const pending = total - completed;
             const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-            document.getElementById('progressText').textContent = `${percent}%`;
-            document.getElementById('progressFill').style.width = `${percent}%`;
+            
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+            document.getElementById('progressPercent').textContent = percent + '%';
+            
+            // Update progress ring
+            const circle = document.getElementById('progressCircle');
+            const circumference = 201;
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            
+            // Update message
+            const messages = [
+                { min: 0, max: 0, text: "Add some tasks to get started!" },
+                { min: 1, max: 25, text: "Great start! Keep going! 🚀" },
+                { min: 26, max: 50, text: "You're making progress! 💪" },
+                { min: 51, max: 75, text: "More than halfway there! 🎯" },
+                { min: 76, max: 99, text: "Almost done! You got this! ⭐" },
+                { min: 100, max: 100, text: "All done! You're amazing! 🎉" }
+            ];
+            const msg = messages.find(m => percent >= m.min && percent <= m.max);
+            document.getElementById('progressMessage').textContent = msg ? msg.text : '';
         }
         
-        function renderCategoryFilters() {
-            const container = document.getElementById('categoryFilters');
-            let html = `<button class="category-tag ${currentCategory === 'all' ? 'active' : ''}" data-cat="all">All</button>`;
-            
-            for (const [key, val] of Object.entries(categories)) {
-                const count = todos.filter(t => t.category === key).length;
-                if (count > 0) {
-                    html += `<button class="category-tag ${currentCategory === key ? 'active' : ''}" data-cat="${key}">${val.emoji} ${key} (${count})</button>`;
-                }
-            }
-            container.innerHTML = html;
-            
-            container.querySelectorAll('.category-tag').forEach(btn => {
-                btn.onclick = () => {
-                    currentCategory = btn.dataset.cat;
-                    renderCategoryFilters();
-                    render();
-                };
+        function getFilteredTodos() {
+            return todos.filter(todo => {
+                if (currentFilter === 'active' && todo.done) return false;
+                if (currentFilter === 'completed' && !todo.done) return false;
+                if (currentFilter === 'overdue' && (!isOverdue(todo.dueDate) || todo.done)) return false;
+                if (searchQuery && !todo.text.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                return true;
             });
         }
         
@@ -379,38 +682,33 @@
             const list = document.getElementById('todoList');
             const filtered = getFilteredTodos();
             
-            // Sort: priority high first, then by due date
             filtered.sort((a, b) => {
                 const priorityOrder = { high: 0, medium: 1, low: 2 };
                 if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
                     return priorityOrder[a.priority] - priorityOrder[b.priority];
                 }
-                if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
-                if (a.dueDate) return -1;
-                if (b.dueDate) return 1;
                 return b.createdAt - a.createdAt;
             });
             
             if (filtered.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="emoji">📝</div>
-                        <p>No tasks found</p>
+                        <div class="emoji">✨</div>
+                        <p>No tasks here. Time to add some magic!</p>
                     </div>
                 `;
             } else {
                 list.innerHTML = filtered.map(todo => {
-                    const cat = categories[todo.category] || categories.other;
                     const overdue = isOverdue(todo.dueDate) && !todo.done;
+                    const categoryEmojis = { personal: '👤', work: '💼', shopping: '🛒', health: '❤️' };
                     return `
                         <li class="todo-item priority-${todo.priority} ${todo.done ? 'done' : ''}">
-                            <div class="checkbox ${todo.done ? 'checked' : ''}" onclick="toggle('${todo.id}')"></div>
+                            <div class="water-checkbox ${todo.done ? 'checked' : ''}" onclick="toggle('${todo.id}')"></div>
                             <div class="todo-content">
                                 <div class="todo-text">${todo.text}</div>
                                 <div class="todo-meta">
-                                    <span>${cat.emoji} ${todo.category}</span>
-                                    ${todo.dueDate ? `<span style="${overdue ? 'color:#e74c3c' : ''}">📅 ${formatDate(todo.dueDate)}${overdue ? ' (overdue!)' : ''}</span>` : ''}
-                                    <span>⚡ ${todo.priority}</span>
+                                    <span>${categoryEmojis[todo.category] || '📌'} ${todo.category}</span>
+                                    ${todo.dueDate ? `<span class="${overdue ? 'overdue' : ''}">📅 ${formatDate(todo.dueDate)}${overdue ? ' ⚠️' : ''}</span>` : ''}
                                 </div>
                             </div>
                             <div class="todo-actions">
@@ -427,24 +725,20 @@
         
         function addTodo() {
             const input = document.getElementById('todoInput');
-            const priority = document.getElementById('prioritySelect').value;
-            const category = document.getElementById('categorySelect').value;
-            const dueDate = document.getElementById('dueDate').value;
+            const text = input.value.trim();
             
-            if (input.value.trim()) {
+            if (text) {
                 todos.push({
                     id: generateId(),
-                    text: input.value.trim(),
+                    text: text,
                     done: false,
-                    priority,
-                    category,
-                    dueDate,
+                    priority: document.getElementById('prioritySelect').value,
+                    category: document.getElementById('categorySelect').value,
+                    dueDate: document.getElementById('dueDate').value,
                     createdAt: Date.now()
                 });
                 saveTodos();
                 input.value = '';
-                document.getElementById('dueDate').value = '';
-                renderCategoryFilters();
                 render();
             }
         }
@@ -461,7 +755,6 @@
         function remove(id) {
             todos = todos.filter(t => t.id !== id);
             saveTodos();
-            renderCategoryFilters();
             render();
         }
         
@@ -482,9 +775,9 @@
             if (e.key === 'Enter') addTodo();
         });
         
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        document.querySelectorAll('.filter-pill').forEach(btn => {
             btn.onclick = () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 currentFilter = btn.dataset.filter;
                 render();
@@ -496,11 +789,23 @@
             render();
         });
         
-        // Set default date to today
+        // Ripple effect on buttons
+        document.querySelectorAll('.droplet-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = (e.clientX - rect.left) + 'px';
+                ripple.style.top = (e.clientY - rect.top) + 'px';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+        
+        // Set default date
         document.getElementById('dueDate').valueAsDate = new Date();
         
         // Initial render
-        renderCategoryFilters();
         render();
     </script>
 </body>
